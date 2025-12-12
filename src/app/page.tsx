@@ -22,13 +22,18 @@ export default function Home() {
             Train for your interviews with an intelligent voice agent.
           </p>
           <p className="mx-auto mb-12 max-w-2xl text-base text-slate-500 dark:text-slate-500 md:text-lg">
-            Practice job, visa, or academic interviews with advanced artificial intelligence technology. 
-            Get real-time feedback, improve your communication skills, and boost your confidence 
+            Practice job, visa, or academic interviews with advanced artificial intelligence technology.
+            Get real-time feedback, improve your communication skills, and boost your confidence
             before the real interview.
           </p>
-          <Button asChild size="lg" className="text-lg px-8 py-6 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900">
-            <Link href="/login">Get Started</Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button asChild size="lg" className="text-lg px-8 py-6 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900">
+              <Link href="/interview">Tomar Entrevista</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6">
+              <Link href="/login">Get Started</Link>
+            </Button>
+          </div>
         </div>
       </main>
 

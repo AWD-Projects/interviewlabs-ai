@@ -35,6 +35,26 @@ interface AnalysisResult {
   sentiment_analysis?: SentimentResult[];
 }
 
+interface TranscriptMessage {
+  role: string;
+  time_in_call_secs: number;
+  message: string;
+}
+
+interface ConversationDetails {
+  agent_id: string;
+  conversation_id: string;
+  status: string;
+  transcript: TranscriptMessage[];
+  metadata: {
+    start_time_unix_secs: number;
+    call_duration_secs: number;
+  };
+  has_audio: boolean;
+  has_user_audio: boolean;
+  has_response_audio: boolean;
+}
+
 export default function ProgressPage() {
   const params = useParams();
   const profileId = params.profileId as string;
@@ -43,6 +63,8 @@ export default function ProgressPage() {
   const [error, setError] = useState<string | null>(null);
   const [analyzingMap, setAnalyzingMap] = useState<Record<string, boolean>>({});
   const [analysisResults, setAnalysisResults] = useState<Record<string, AnalysisResult>>({});
+  const [transcripts, setTranscripts] = useState<Record<string, ConversationDetails>>({});
+  const [loadingTranscripts, setLoadingTranscripts] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -66,6 +88,27 @@ export default function ProgressPage() {
 
     fetchConversations();
   }, []);
+
+  const handleFetchTranscript = async (conversationId: string) => {
+    try {
+      setLoadingTranscripts((prev) => ({ ...prev, [conversationId]: true }));
+
+      const response = await fetch(
+        `/api/eleven/conversations/${conversationId}/transcript`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch transcript");
+      }
+
+      const data: ConversationDetails = await response.json();
+      setTranscripts((prev) => ({ ...prev, [conversationId]: data }));
+    } catch (err) {
+      console.error("Error fetching transcript:", err);
+    } finally {
+      setLoadingTranscripts((prev) => ({ ...prev, [conversationId]: false }));
+    }
+  };
 
   const handleAnalyzeEmotions = async (conversationId: string) => {
     try {
@@ -165,6 +208,67 @@ export default function ProgressPage() {
                       Your browser does not support the audio element.
                     </audio>
                   </div>
+
+                  {/* Transcript Section */}
+                  {!transcripts[conversation.conversation_id] ? (
+                    <div className="flex justify-start">
+                      <Button
+                        onClick={() => handleFetchTranscript(conversation.conversation_id)}
+                        disabled={loadingTranscripts[conversation.conversation_id]}
+                        size="sm"
+                        variant="outline"
+                      >
+                        {loadingTranscripts[conversation.conversation_id]
+                          ? "Loading transcript..."
+                          : "Show Transcript"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg bg-muted/30 p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-sm">Conversation Transcript</h4>
+                        <Button
+                          onClick={() => setTranscripts((prev) => {
+                            const newTranscripts = { ...prev };
+                            delete newTranscripts[conversation.conversation_id];
+                            return newTranscripts;
+                          })}
+                          size="sm"
+                          variant="ghost"
+                        >
+                          Hide
+                        </Button>
+                      </div>
+
+                      <div className="text-xs text-muted-foreground">
+                        <p>Duration: {Math.floor(transcripts[conversation.conversation_id].metadata.call_duration_secs / 60)}m {transcripts[conversation.conversation_id].metadata.call_duration_secs % 60}s</p>
+                        <p>Started: {new Date(transcripts[conversation.conversation_id].metadata.start_time_unix_secs * 1000).toLocaleString()}</p>
+                      </div>
+
+                      <div className="space-y-2 max-h-80 overflow-y-auto">
+                        {transcripts[conversation.conversation_id].transcript.map((message, idx) => (
+                          <div
+                            key={idx}
+                            className={`rounded-lg p-3 ${
+                              message.role === 'user'
+                                ? 'bg-blue-50 border border-blue-200'
+                                : 'bg-green-50 border border-green-200'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-semibold uppercase">
+                                {message.role}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {Math.floor(message.time_in_call_secs / 60)}:{String(message.time_in_call_secs % 60).padStart(2, '0')}
+                              </span>
+                            </div>
+                            <p className="text-sm">{message.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Analyze Emotions Button */}
                   <div className="flex justify-end">

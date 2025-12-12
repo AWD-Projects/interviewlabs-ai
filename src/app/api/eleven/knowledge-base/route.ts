@@ -39,14 +39,67 @@ export async function POST(request: NextRequest) {
       data = { message: text };
     }
 
+    console.log("ElevenLabs upload response status:", response.status);
+    console.log("ElevenLabs upload response body:", data);
+
     if (!response.ok) {
       console.error("ElevenLabs upload failed:", response.status, data);
       return NextResponse.json(data, { status: response.status });
     }
 
-    // Optionally update the agent's knowledge base with the new document
-    if (data?.id) {
+    // If upload succeeded and returned an id, append it to the agent's knowledge base
+    const docId =
+      data?.id ||
+      data?.document_id ||
+      data?.documentId ||
+      data?.document?.id ||
+      data?.document?.document_id;
+    const docName =
+      data?.name ||
+      data?.document_name ||
+      data?.document?.name ||
+      data?.document?.document_name ||
+      "Document";
+
+    if (docId) {
       try {
+        // Fetch existing agent config to preserve current KB entries
+        const currentRes = await fetch(`https://api.elevenlabs.io/v1/convai/agents/${agentId}`, {
+          method: "GET",
+          headers: { "xi-api-key": apiKey },
+        });
+
+        const currentText = await currentRes.text();
+        let currentData: any;
+        try {
+          currentData = JSON.parse(currentText);
+        } catch {
+          currentData = { message: currentText };
+        }
+
+        if (!currentRes.ok) {
+          console.error("ElevenLabs agent fetch failed:", currentRes.status, currentData);
+          return NextResponse.json(
+            { upload: data, agentFetch: currentData, error: "Agent fetch failed" },
+            { status: currentRes.status }
+          );
+        }
+
+        const existingKb: any[] =
+          currentData?.conversation_config?.agent?.prompt?.knowledge_base &&
+          Array.isArray(currentData.conversation_config.agent.prompt.knowledge_base)
+            ? currentData.conversation_config.agent.prompt.knowledge_base
+            : [];
+
+        const updatedKb = [
+          ...existingKb,
+          {
+            type: "file",
+            name: docName,
+            id: docId,
+          },
+        ];
+
         const updateRes = await fetch(`https://api.elevenlabs.io/v1/convai/agents/${agentId}`, {
           method: "PATCH",
           headers: {
@@ -54,16 +107,11 @@ export async function POST(request: NextRequest) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            conversationConfig: {
+            conversation_config: {
               agent: {
                 prompt: {
-                  knowledgeBase: [
-                    {
-                      type: "text",
-                      name: data.name ?? "Document",
-                      id: data.id,
-                    },
-                  ],
+                  knowledge_base: updatedKb,
+                  rag: { enabled: true },
                 },
               },
             },
@@ -93,7 +141,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(data, { status: response.status });
+    console.error("Upload succeeded but no document id returned:", data);
+    return NextResponse.json({ upload: data, error: "No document id returned" }, { status: 500 });
   } catch (error) {
     console.error("Error uploading file to ElevenLabs:", error);
     return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });

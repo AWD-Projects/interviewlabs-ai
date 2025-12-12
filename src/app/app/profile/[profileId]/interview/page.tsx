@@ -35,12 +35,6 @@ export default function InterviewPage() {
         {/* Left Panel - Interview Controls */}
         <div className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Interview Panel</CardTitle>
-              <CardDescription>
-                Control your practice session
-              </CardDescription>
-            </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-lg border-2 border-dashed p-6">
                 <p className="mb-4 text-sm text-muted-foreground text-center">
@@ -48,33 +42,6 @@ export default function InterviewPage() {
                 </p>
                 <ElevenLabsWidget agentId="agent_4401kc7zt9xeenqt8tte6qrd683j" />
               </div>
-
-              <Button onClick={handleStartInterview} className="w-full" size="lg">
-                Start Interview
-              </Button>
-
-              <Button
-                onClick={handleEndInterview}
-                variant="outline"
-                className="w-full"
-              >
-                End Interview (mock)
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Panel - Transcript */}
-        <div className="space-y-4">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Transcript</CardTitle>
-              <CardDescription>
-                Real-time conversation (mock)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="max-h-[600px] overflow-y-auto">
-              <TranscriptMock />
             </CardContent>
           </Card>
         </div>

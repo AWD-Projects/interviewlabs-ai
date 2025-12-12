@@ -20,6 +20,14 @@ export async function getCurrentUserServer(): Promise<AuthUser | null> {
       };
     }
 
+    if (!adminAuth) {
+      console.warn("Admin auth not initialized; returning mock user.");
+      return {
+        uid: "mock-user",
+        email: "mock@example.com",
+      };
+    }
+
     const decodedToken = await adminAuth.verifyIdToken(token);
     return {
       uid: decodedToken.uid,

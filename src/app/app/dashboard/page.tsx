@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { ProfileCard } from "@/components/profiles/ProfileCard";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { collection, doc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
@@ -18,6 +18,9 @@ export default function DashboardPage() {
   const [title, setTitle] = useState("Visa USA B1/B2");
   const [description, setDescription] = useState("Explica brevemente de qué trata la práctica.");
   const [language, setLanguage] = useState<"es" | "en">("es");
+  const [isUploading, setIsUploading] = useState(false);
+  const [hasDocument, setHasDocument] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
@@ -51,6 +54,48 @@ export default function DashboardPage() {
     }
   };
 
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+      setError("Debes iniciar sesión para subir documentos.");
+      return;
+    }
+
+    setError(null);
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file, file.name);
+
+      const res = await fetch("/api/eleven/knowledge-base", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Upload failed with status ${res.status}`);
+      }
+
+      setHasDocument(true);
+    } catch (err) {
+      console.error("Error uploading document:", err);
+      setError("No se pudo subir el documento. Intenta de nuevo.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
   const handleCreateProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!user) {
@@ -75,6 +120,7 @@ export default function DashboardPage() {
       setTitle("Visa USA B1/B2");
       setDescription("Explica brevemente de qué trata la práctica.");
       setLanguage("es");
+      setHasDocument(false);
       await fetchProfiles(user.uid);
     } catch (err) {
       console.error("Error creating profile:", err);
@@ -96,6 +142,13 @@ export default function DashboardPage() {
             Select a profile to start practicing or create a new one
           </p>
           <form onSubmit={handleCreateProfile} className="space-y-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,.md,.pdf,.doc,.docx"
+              className="hidden"
+              onChange={handleFileChange}
+            />
             <div className="grid gap-3 md:grid-cols-3">
               <input
                 className="rounded-md border px-3 py-2 text-sm"
@@ -119,10 +172,20 @@ export default function DashboardPage() {
                 <option value="es">Español</option>
                 <option value="en">English</option>
               </select>
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2 md:col-span-1"
+                onClick={handleUploadClick}
+                disabled={isUploading}
+              >
+                <Upload className="h-4 w-4" />
+                {isUploading ? "Uploading..." : hasDocument ? "Document Uploaded" : "Upload Document"}
+              </Button>
             </div>
             <Button
               type="submit"
-              disabled={isCreating}
+              disabled={isCreating || !hasDocument}
               className="gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900"
             >
               <Plus className="h-4 w-4" />

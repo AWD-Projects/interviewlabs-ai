@@ -8,7 +8,7 @@ export interface AuthUser {
 
 export async function getCurrentUserServer(): Promise<AuthUser | null> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token =
       cookieStore.get("session")?.value || cookieStore.get("token")?.value || cookieStore.get("idToken")?.value;
 

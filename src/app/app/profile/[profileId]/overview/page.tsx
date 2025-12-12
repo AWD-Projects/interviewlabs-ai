@@ -1,22 +1,70 @@
+"use client";
+
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { auth } from "@/lib/firebase/client";
 
-interface ProfileOverviewPageProps {
-  params: Promise<{ profileId: string }>;
-}
-
-export default async function ProfileOverviewPage({ params }: ProfileOverviewPageProps) {
-  const { profileId } = await params;
+export default function ProfileOverviewPage() {
+  const { profileId } = useParams<{ profileId: string }>();
+  const [hasDocument, setHasDocument] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const router = useRouter();
 
   // Mock data - TODO: replace with real data from Firestore
   const mockProfile = {
-    id: profileId,
+    id: profileId ?? "unknown",
     name: "Job Interview - Software Engineer",
     type: "Job Interview",
     language: "English",
     level: "Advanced",
     description: "Preparation for technical interview at FAANG company",
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !profileId) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+      setUploadError("Debes iniciar sesión para subir documentos.");
+      return;
+    }
+
+    setUploadError(null);
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file, file.name);
+      formData.append("profileId", profileId);
+
+      const res = await fetch("/api/eleven/knowledge-base", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Upload failed with status ${res.status}`);
+      }
+
+      setHasDocument(true);
+    } catch (error) {
+      console.error("Error uploading document:", error);
+      setUploadError("No se pudo subir el documento. Intenta de nuevo.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   };
 
   return (
@@ -51,20 +99,43 @@ export default async function ProfileOverviewPage({ params }: ProfileOverviewPag
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
-              Start practicing or review your progress
+              Upload supporting docs first, then start your interview practice.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button asChild className="w-full">
-              <Link href={`/app/profile/${profileId}/interview`}>
-                Practice Interview
-              </Link>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,.md,.pdf,.doc,.docx"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleUploadClick}
+              disabled={isUploading}
+            >
+              {isUploading ? "Uploading..." : "Upload Documents"}
             </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link href={`/app/profile/${profileId}/progress`}>
-                View Progress
-              </Link>
+            <Button
+              className="w-full"
+              disabled={!hasDocument}
+              aria-disabled={!hasDocument}
+              onClick={() => {
+                if (!hasDocument || !profileId) return;
+                router.push(`/app/profile/${profileId}/interview`);
+              }}
+            >
+              Practice Interview
             </Button>
+            {uploadError ? <p className="text-sm text-red-600">{uploadError}</p> : null}
+            {!hasDocument ? (
+              <p className="text-xs text-muted-foreground">
+                Practice is disabled until you upload at least one document.
+              </p>
+            ) : null}
           </CardContent>
         </Card>
       </div>

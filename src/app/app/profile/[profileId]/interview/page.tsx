@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TranscriptMock } from "@/components/interview/TranscriptMock";
+import { ElevenLabsWidget } from "@/components/interview/ElevenLabsWidget";
 import { useParams, useRouter } from "next/navigation";
 
 export default function InterviewPage() {
@@ -41,14 +42,11 @@ export default function InterviewPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg border-2 border-dashed p-6 text-center">
-                <p className="mb-4 text-sm text-muted-foreground">
-                  The ElevenLabs widget will load here
+              <div className="rounded-lg border-2 border-dashed p-6">
+                <p className="mb-4 text-sm text-muted-foreground text-center">
+                  ElevenLabs AI Interview Agent
                 </p>
-                {/* TODO: aquí se integrará el widget / cliente del Agent de ElevenLabs */}
-                <div id="eleven-agent-widget-root" className="min-h-[200px] flex items-center justify-center bg-muted/50 rounded">
-                  <p className="text-muted-foreground">Widget Placeholder</p>
-                </div>
+                <ElevenLabsWidget agentId="agent_4401kc7zt9xeenqt8tte6qrd683j" />
               </div>
 
               <Button onClick={handleStartInterview} className="w-full" size="lg">

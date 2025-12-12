@@ -9,14 +9,14 @@ interface ProfileOverviewPageProps {
 export default async function ProfileOverviewPage({ params }: ProfileOverviewPageProps) {
   const { profileId } = await params;
 
-  // Mock data - TODO: reemplazar con datos reales de Firestore
+  // Mock data - TODO: replace with real data from Firestore
   const mockProfile = {
     id: profileId,
-    name: "Entrevista de Trabajo - Software Engineer",
+    name: "Job Interview - Software Engineer",
     type: "Job Interview",
-    language: "Inglés",
-    level: "Avanzado",
-    description: "Preparación para entrevista técnica en empresa FAANG",
+    language: "English",
+    level: "Advanced",
+    description: "Preparation for technical interview at FAANG company",
   };
 
   return (
@@ -29,19 +29,19 @@ export default async function ProfileOverviewPage({ params }: ProfileOverviewPag
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Detalles del Perfil</CardTitle>
+            <CardTitle>Profile Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Tipo:</span>
+              <span className="text-muted-foreground">Type:</span>
               <span className="font-medium">{mockProfile.type}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Idioma:</span>
+              <span className="text-muted-foreground">Language:</span>
               <span className="font-medium">{mockProfile.language}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Nivel:</span>
+              <span className="text-muted-foreground">Level:</span>
               <span className="font-medium">{mockProfile.level}</span>
             </div>
           </CardContent>
@@ -49,20 +49,20 @@ export default async function ProfileOverviewPage({ params }: ProfileOverviewPag
 
         <Card>
           <CardHeader>
-            <CardTitle>Acciones Rápidas</CardTitle>
+            <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
-              Comienza a practicar o revisa tu progreso
+              Start practicing or review your progress
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button asChild className="w-full">
               <Link href={`/app/profile/${profileId}/interview`}>
-                Practicar entrevista
+                Practice Interview
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
               <Link href={`/app/profile/${profileId}/progress`}>
-                Ver progreso
+                View Progress
               </Link>
             </Button>
           </CardContent>

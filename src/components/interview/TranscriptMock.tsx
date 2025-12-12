@@ -13,22 +13,22 @@ export function TranscriptMock({ messages }: TranscriptMockProps) {
   const defaultMessages: TranscriptMessage[] = [
     {
       role: "agent",
-      content: "Hola, bienvenido a tu entrevista de práctica. ¿Estás listo para comenzar?",
+      content: "Hello, welcome to your practice interview. Are you ready to begin?",
       timestamp: "10:00 AM",
     },
     {
       role: "user",
-      content: "Sí, estoy listo. Gracias.",
+      content: "Yes, I'm ready. Thank you.",
       timestamp: "10:00 AM",
     },
     {
       role: "agent",
-      content: "Perfecto. Cuéntame sobre tu experiencia más reciente en desarrollo de software.",
+      content: "Perfect. Tell me about your most recent experience in software development.",
       timestamp: "10:01 AM",
     },
     {
       role: "user",
-      content: "He trabajado los últimos 3 años como desarrollador full-stack en una startup...",
+      content: "I've worked for the past 3 years as a full-stack developer at a startup...",
       timestamp: "10:01 AM",
     },
   ];

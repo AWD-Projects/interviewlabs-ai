@@ -29,9 +29,9 @@ export default async function ProgressPage({ params }: ProgressPageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Tu Progreso</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Your Progress</h1>
         <p className="text-muted-foreground">
-          Revisa tu desempeño y mejora continua
+          Review your performance and continuous improvement
         </p>
       </div>
 
@@ -41,8 +41,8 @@ export default async function ProgressPage({ params }: ProgressPageProps) {
       {/* Recent Sessions */}
       <Card>
         <CardHeader>
-          <CardTitle>Últimas Sesiones</CardTitle>
-          <CardDescription>Tus 3 sesiones más recientes</CardDescription>
+          <CardTitle>Recent Sessions</CardTitle>
+          <CardDescription>Your 3 most recent sessions</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -54,7 +54,7 @@ export default async function ProgressPage({ params }: ProgressPageProps) {
                 <div>
                   <p className="font-medium">{session.date}</p>
                   <p className="text-sm text-muted-foreground">
-                    Duración: {session.duration}
+                    Duration: {session.duration}
                   </p>
                 </div>
                 <div className="text-right">
@@ -70,15 +70,15 @@ export default async function ProgressPage({ params }: ProgressPageProps) {
       {/* Progress Chart - Simple Bar Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Evolución del Score</CardTitle>
-          <CardDescription>Últimas 5 sesiones</CardDescription>
+          <CardTitle>Score Evolution</CardTitle>
+          <CardDescription>Last 5 sessions</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {mockData.chartData.map((data) => (
               <div key={data.session} className="flex items-center gap-4">
                 <span className="w-20 text-sm text-muted-foreground">
-                  Sesión {data.session}
+                  Session {data.session}
                 </span>
                 <div className="flex-1">
                   <div className="h-8 w-full rounded-full bg-muted">

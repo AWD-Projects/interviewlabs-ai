@@ -14,8 +14,8 @@ export function AppShell({ children }: AppShellProps) {
 
   const navItems = [
     { href: "/app/dashboard", label: "Dashboard" },
-    { href: "/app/profile/mock-profile/overview", label: "Perfil Actual" },
-    { href: "/app/profile/mock-profile/progress", label: "Progreso" },
+    { href: "/app/profile/mock-profile/overview", label: "Current Profile" },
+    { href: "/app/profile/mock-profile/progress", label: "Progress" },
   ];
 
   return (
@@ -49,10 +49,10 @@ export function AppShell({ children }: AppShellProps) {
               className="w-full"
               onClick={() => {
                 console.log("Logout clicked");
-                // TODO: implementar logout con Firebase Auth
+                // TODO: implement logout with Firebase Auth
               }}
             >
-              Cerrar Sesión
+              Sign Out
             </Button>
           </div>
         </div>

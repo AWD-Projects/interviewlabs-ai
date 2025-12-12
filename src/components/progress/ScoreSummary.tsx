@@ -36,7 +36,7 @@ export function ScoreSummary({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Score Actual</CardTitle>
+        <CardTitle>Current Score</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-baseline gap-2">
@@ -47,9 +47,9 @@ export function ScoreSummary({
           </span>
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
-          {trend === "up" && "¡Mejorando! Sigue así."}
-          {trend === "down" && "Necesitas más práctica."}
-          {trend === "stable" && "Rendimiento estable."}
+          {trend === "up" && "Improving! Keep it up."}
+          {trend === "down" && "You need more practice."}
+          {trend === "stable" && "Stable performance."}
         </p>
       </CardContent>
     </Card>

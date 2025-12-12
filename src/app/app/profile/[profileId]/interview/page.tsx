@@ -24,9 +24,9 @@ export default function InterviewPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Sesión de Entrevista</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Interview Session</h1>
         <p className="text-muted-foreground">
-          Practica tu entrevista con nuestro agente de voz inteligente
+          Practice your interview with our intelligent voice agent
         </p>
       </div>
 
@@ -35,15 +35,15 @@ export default function InterviewPage() {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Panel de Entrevista</CardTitle>
+              <CardTitle>Interview Panel</CardTitle>
               <CardDescription>
-                Controla tu sesión de práctica
+                Control your practice session
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-lg border-2 border-dashed p-6 text-center">
                 <p className="mb-4 text-sm text-muted-foreground">
-                  El widget de ElevenLabs se cargará aquí
+                  The ElevenLabs widget will load here
                 </p>
                 {/* TODO: aquí se integrará el widget / cliente del Agent de ElevenLabs */}
                 <div id="eleven-agent-widget-root" className="min-h-[200px] flex items-center justify-center bg-muted/50 rounded">
@@ -52,7 +52,7 @@ export default function InterviewPage() {
               </div>
 
               <Button onClick={handleStartInterview} className="w-full" size="lg">
-                Iniciar Entrevista
+                Start Interview
               </Button>
 
               <Button
@@ -60,7 +60,7 @@ export default function InterviewPage() {
                 variant="outline"
                 className="w-full"
               >
-                Terminar Entrevista (mock)
+                End Interview (mock)
               </Button>
             </CardContent>
           </Card>
@@ -70,9 +70,9 @@ export default function InterviewPage() {
         <div className="space-y-4">
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Transcripción</CardTitle>
+              <CardTitle>Transcript</CardTitle>
               <CardDescription>
-                Conversación en tiempo real (mock)
+                Real-time conversation (mock)
               </CardDescription>
             </CardHeader>
             <CardContent className="max-h-[600px] overflow-y-auto">

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScoreSummary } from "@/components/progress/ScoreSummary";
 
 interface Conversation {
   conversation_id: string;
@@ -44,19 +43,6 @@ export default function ProgressPage() {
   const [error, setError] = useState<string | null>(null);
   const [analyzingMap, setAnalyzingMap] = useState<Record<string, boolean>>({});
   const [analysisResults, setAnalysisResults] = useState<Record<string, AnalysisResult>>({});
-
-  // TODO: reemplazar datos mock por lecturas reales desde Firestore
-  const mockData = {
-    currentScore: 82,
-    trend: "up" as const,
-    chartData: [
-      { session: 1, score: 65 },
-      { session: 2, score: 70 },
-      { session: 3, score: 75 },
-      { session: 4, score: 78 },
-      { session: 5, score: 82 },
-    ],
-  };
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -114,9 +100,6 @@ export default function ProgressPage() {
           Review your performance and continuous improvement
         </p>
       </div>
-
-      {/* Score Summary */}
-      <ScoreSummary currentScore={mockData.currentScore} trend={mockData.trend} />
 
       {/* Recent Conversations */}
       <Card>
@@ -254,33 +237,6 @@ export default function ProgressPage() {
         </CardContent>
       </Card>
 
-      {/* Progress Chart - Simple Bar Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Score Evolution</CardTitle>
-          <CardDescription>Last 5 sessions</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {mockData.chartData.map((data) => (
-              <div key={data.session} className="flex items-center gap-4">
-                <span className="w-20 text-sm text-muted-foreground">
-                  Session {data.session}
-                </span>
-                <div className="flex-1">
-                  <div className="h-8 w-full rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-primary transition-all"
-                      style={{ width: `${data.score}%` }}
-                    />
-                  </div>
-                </div>
-                <span className="w-12 text-right font-medium">{data.score}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

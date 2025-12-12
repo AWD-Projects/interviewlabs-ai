@@ -8,8 +8,7 @@ import { auth } from "@/lib/firebase/client";
 
 export default function ProfileOverviewPage() {
   const { profileId } = useParams<{ profileId: string }>();
-  const [hasDocument, setHasDocument] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [hasDocument] = useState(true);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
@@ -22,49 +21,6 @@ export default function ProfileOverviewPage() {
     language: "English",
     level: "Advanced",
     description: "Preparation for technical interview at FAANG company",
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !profileId) return;
-
-    const user = auth.currentUser;
-    if (!user) {
-      setUploadError("Debes iniciar sesión para subir documentos.");
-      return;
-    }
-
-    setUploadError(null);
-    setIsUploading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file, file.name);
-      formData.append("profileId", profileId);
-
-      const res = await fetch("/api/eleven/knowledge-base", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error(`Upload failed with status ${res.status}`);
-      }
-
-      setHasDocument(true);
-    } catch (error) {
-      console.error("Error uploading document:", error);
-      setUploadError("No se pudo subir el documento. Intenta de nuevo.");
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
   };
 
   return (
@@ -99,26 +55,10 @@ export default function ProfileOverviewPage() {
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
-              Upload supporting docs first, then start your interview practice.
+              Start your interview practice.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".txt,.md,.pdf,.doc,.docx"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleUploadClick}
-              disabled={isUploading}
-            >
-              {isUploading ? "Uploading..." : "Upload Documents"}
-            </Button>
             <Button
               className="w-full"
               disabled={!hasDocument}
@@ -131,11 +71,6 @@ export default function ProfileOverviewPage() {
               Practice Interview
             </Button>
             {uploadError ? <p className="text-sm text-red-600">{uploadError}</p> : null}
-            {!hasDocument ? (
-              <p className="text-xs text-muted-foreground">
-                Practice is disabled until you upload at least one document.
-              </p>
-            ) : null}
           </CardContent>
         </Card>
       </div>

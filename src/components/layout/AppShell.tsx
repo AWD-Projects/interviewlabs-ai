@@ -18,7 +18,6 @@ export function AppShell({ children }: AppShellProps) {
 
   const navItems = [
     { href: "/app/dashboard", label: "Dashboard" },
-    { href: "/app/profile/mock-profile/overview", label: "Current Profile" },
     { href: "/app/profile/mock-profile/progress", label: "Progress" },
   ];
 

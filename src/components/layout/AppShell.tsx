@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { signOutClient } from "@/lib/auth-client";
+import { useState } from "react";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -11,6 +13,8 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const navItems = [
     { href: "/app/dashboard", label: "Dashboard" },
@@ -47,12 +51,20 @@ export function AppShell({ children }: AppShellProps) {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => {
-                console.log("Logout clicked");
-                // TODO: implement logout with Firebase Auth
+              disabled={isSigningOut}
+              onClick={async () => {
+                try {
+                  setIsSigningOut(true);
+                  await signOutClient();
+                  router.push("/login");
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                } finally {
+                  setIsSigningOut(false);
+                }
               }}
             >
-              Sign Out
+              {isSigningOut ? "Signing out..." : "Sign Out"}
             </Button>
           </div>
         </div>

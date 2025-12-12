@@ -3,18 +3,33 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { signInWithEmailPassword } from "@/lib/auth-client";
 import Link from "next/link";
-import { FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 
 export default function LoginPage() {
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    console.log("Login attempt:", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-    });
-    // TODO: integrar Firebase Auth aquí
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    setError(null);
+    setIsLoading(true);
+    try {
+      await signInWithEmailPassword(email, password);
+      router.push("/app/dashboard");
+    } catch (err) {
+      console.error("Error signing in:", err);
+      setError("No se pudo iniciar sesión. Verifica tus credenciales.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -65,9 +80,14 @@ export default function LoginPage() {
                 className="h-11"
               />
             </div>
-            <Button type="submit" className="w-full h-11 text-base bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900">
-              Sign In
+            <Button
+              type="submit"
+              className="w-full h-11 text-base bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900"
+              disabled={isLoading}
+            >
+              {isLoading ? "Ingresando..." : "Sign In"}
             </Button>
+            {error ? <p className="text-sm text-red-600">{error}</p> : null}
           </form>
           <div className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
             Don't have an account?{" "}

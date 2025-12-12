@@ -24,6 +24,19 @@ export async function createProfile(
   }
 ): Promise<InterviewProfile> {
   try {
+    if (!adminDb) {
+      console.warn("Admin DB not initialized. Returning mock profile.");
+      return {
+        id: "",
+        userId,
+        title: data.title,
+        type: data.type,
+        language: data.language,
+        level: data.level,
+        elevenAgentId: data.elevenAgentId,
+        createdAt: new Date(),
+      };
+    }
     const docRef = adminDb.collection("interviewProfiles").doc();
     const createdAt = new Date();
     const payload = { ...data, userId, createdAt };
@@ -46,6 +59,10 @@ export async function createProfile(
 
 export async function getProfilesByUser(userId: string): Promise<InterviewProfile[]> {
   try {
+    if (!adminDb) {
+      console.warn("Admin DB not initialized. Returning empty profiles list.");
+      return [];
+    }
     const snapshot = await adminDb.collection("interviewProfiles").where("userId", "==", userId).get();
     return snapshot.docs.map((doc) => {
       const data = doc.data();
@@ -69,6 +86,16 @@ export async function getProfilesByUser(userId: string): Promise<InterviewProfil
 
 export async function createSession(userId: string, profileId: string): Promise<InterviewSession> {
   try {
+    if (!adminDb) {
+      console.warn("Admin DB not initialized. Returning mock session.");
+      return {
+        id: "",
+        userId,
+        profileId,
+        status: "in_progress",
+        startedAt: new Date(),
+      };
+    }
     const docRef = adminDb.collection("sessions").doc();
     const startedAt = new Date();
     const payload: Omit<InterviewSession, "id"> = {
@@ -102,6 +129,10 @@ export async function updateSessionAfterSync(
   }
 ): Promise<void> {
   try {
+    if (!adminDb) {
+      console.warn("Admin DB not initialized. Skipping session update.");
+      return;
+    }
     const endedAt = update.endedAt ?? (update.status ? new Date() : undefined);
     await adminDb
       .collection("sessions")
@@ -128,6 +159,14 @@ export async function saveEvaluation(data: {
   improvements: string[];
 }): Promise<Evaluation> {
   try {
+    if (!adminDb) {
+      console.warn("Admin DB not initialized. Returning mock evaluation.");
+      return {
+        id: "",
+        ...data,
+        createdAt: new Date(),
+      };
+    }
     const docRef = adminDb.collection("evaluations").doc();
     const createdAt = new Date();
     const payload = { ...data, createdAt };
@@ -145,6 +184,10 @@ export async function saveEvaluation(data: {
 
 export async function getEvaluationsByProfile(userId: string, profileId: string): Promise<Evaluation[]> {
   try {
+    if (!adminDb) {
+      console.warn("Admin DB not initialized. Returning empty evaluations list.");
+      return [];
+    }
     const snapshot = await adminDb
       .collection("evaluations")
       .where("userId", "==", userId)
@@ -173,6 +216,10 @@ export async function getEvaluationsByProfile(userId: string, profileId: string)
 
 export async function getSessionsByProfile(userId: string, profileId: string): Promise<InterviewSession[]> {
   try {
+    if (!adminDb) {
+      console.warn("Admin DB not initialized. Returning empty sessions list.");
+      return [];
+    }
     const snapshot = await adminDb
       .collection("sessions")
       .where("userId", "==", userId)
